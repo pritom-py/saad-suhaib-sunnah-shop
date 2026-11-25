@@ -1,0 +1,105 @@
+{
+  "common": {
+    "shopName": "Saad Suhaib Sunnah Shop",
+    "tagline": "Trusted destination for Sunnah-compliant & essential Islamic products",
+    "callToAction": "Order Now",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "orderNow": "Order Now",
+    "viewDetails": "View Details",
+    "callForPrice": "Call for Price",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "currency": "৳",
+    "search": "Search",
+    "searchPlaceholder": "Search for your desired product...",
+    "callOrWhatsApp": "Call / WhatsApp",
+    "loading": "Loading...",
+    "allProducts": "All Products",
+    "categories": "Product Categories",
+    "featuredProducts": "Featured Products",
+    "islamicCaps": "Islamic Cap Collection",
+    "wholesaleTitle": "Wholesale & Institutional Orders",
+    "contact": "Contact",
+    "about": "About Us"
+  },
+  "announcement": {
+    "message": "Trusted Islamic products online shop for mosques, madrasas & Muslim brothers",
+    "delivery": "Home delivery nationwide across Bangladesh",
+    "support": "Customer Support"
+  },
+  "trust": {
+    "delivery": "Nationwide Delivery",
+    "quality": "Authentic & Quality Products",
+    "payment": "bKash & Nagad Payments",
+    "return": "Return & Exchange Benefit"
+  },
+  "nav": {
+    "home": "Home",
+    "allProducts": "All Products",
+    "caps": "Caps",
+    "turbans": "Turbans",
+    "scarves": "Scarves / Rumal",
+    "tasbih": "Digital Tasbih",
+    "quranCovers": "Quran Covers",
+    "offers": "Offers",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is currently empty",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery Charge",
+    "discount": "Discount",
+    "total": "Total Payable",
+    "checkout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping",
+    "itemAdded": "Product added to cart"
+  },
+  "checkout": {
+    "title": "Order Form & Checkout",
+    "fullName": "Full Name",
+    "mobileNumber": "Mobile Number",
+    "altMobile": "Alternative Mobile (Optional)",
+    "email": "Email (Optional)",
+    "district": "District",
+    "upazila": "Upazila / Thana",
+    "address": "Full Delivery Address",
+    "notes": "Order Notes (Optional)",
+    "deliveryZone": "Delivery Zone",
+    "insideDhaka": "Inside Dhaka (৳70)",
+    "outsideDhaka": "Outside Dhaka (৳130)",
+    "paymentMethod": "Payment Method",
+    "cod": "Cash on Delivery (Pay when you receive)",
+    "bkash": "bKash (Send Money)",
+    "nagad": "Nagad (Send Money)",
+    "bank": "Islami Bank (Bank Transfer)",
+    "orderSummary": "Order Summary",
+    "confirmOrder": "Confirm Order",
+    "couponPlaceholder": "Enter coupon code",
+    "applyCoupon": "Apply"
+  },
+  "orderSuccess": {
+    "heading": "Your order has been successfully placed!",
+    "message": "Thank you. Our representative will contact you shortly to confirm the order details.",
+    "orderNumber": "Order Number",
+    "trackingInfo": "You can track your package anytime using this order number."
+  },
+  "wholesale": {
+    "heading": "Wholesale Orders for Mosques, Madrasas & Businesses",
+    "subheading": "Special discounted pricing for mosque committees, madrasa teachers, students, and bulk retailers.",
+    "institutionName": "Institution or Business Name (If applicable)",
+    "productNeeds": "Which products and quantities are required?",
+    "submitInquiry": "Submit Wholesale Inquiry",
+    "successMessage": "Your inquiry has been submitted. Our wholesale team will get in touch shortly."
+  },
+  "footer": {
+    "aboutText": "Online shop of trusted Islamic products. Our mission is to deliver quality caps, turbans, scarves, tasbih and Quran covers for mosques, madrasas and general Muslims.",
+    "quickLinks": "Quick Links",
+    "categories": "Categories",
+    "contact": "Contact Us",
+    "copyright": "Saad Suhaib Sunnah Shop. All rights reserved.",
+    "paymentMethods": "Payment Methods"
+  }
+}

@@ -1,0 +1,23 @@
+# dependencies and build output
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# secrets: never commit real environment files
+.env
+.env.*
+!.env.example
+
+# local database (contains customer records and the admin password hash)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# logs and OS files
+*.log
+.DS_Store
+Thumbs.db
+.vercel

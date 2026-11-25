@@ -1,0 +1,485 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// User & Roles for Admin CMS
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  name         String
+  passwordHash String
+  role         String      @default("SUPER_ADMIN") // SUPER_ADMIN, STORE_MANAGER, ORDER_MANAGER, CONTENT_MANAGER, ACCOUNTS_MANAGER, VIEWER
+  isActive     Boolean     @default(true)
+  phone        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  auditLogs    AuditLog[]
+  quotations   Quotation[]
+}
+
+// Customers (both registered and guest profiles)
+model Customer {
+  id                String             @id @default(cuid())
+  name              String
+  phone             String             @unique
+  email             String?            @unique
+  passwordHash      String?
+  isGuest           Boolean            @default(false)
+  isWholesale       Boolean            @default(false)
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  addresses         Address[]
+  orders            Order[]
+  wholesaleInquiries WholesaleInquiry[]
+}
+
+model Address {
+  id           String    @id @default(cuid())
+  customerId   String
+  customer     Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  fullName     String
+  phone        String
+  altPhone     String?
+  district     String
+  upazila      String
+  fullAddress  String
+  isDefault    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// Categories & Hierarchy
+model Category {
+  id          String     @id @default(cuid())
+  nameBn      String
+  nameEn      String
+  slug        String     @unique
+  descriptionBn String?
+  descriptionEn String?
+  imageUrl    String?
+  parentId    String?
+  parent      Category?  @relation("SubCategories", fields: [parentId], references: [id], onDelete: SetNull)
+  subCategories Category[] @relation("SubCategories")
+  displayOrder Int       @default(0)
+  isFeatured  Boolean    @default(false)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  products    Product[]
+}
+
+// Products & Variants
+model Product {
+  id              String           @id @default(cuid())
+  sku             String           @unique
+  slug            String           @unique
+  nameBn          String
+  nameEn          String
+  shortDescBn     String?
+  shortDescEn     String?
+  descBn          String?
+  descEn          String?
+  categoryId      String
+  category        Category         @relation(fields: [categoryId], references: [id])
+  regularPrice    Float?           // null means pending / call for price
+  salePrice       Float?
+  wholesalePrice  Float?
+  minWholesaleQty Int?             @default(12)
+  stockQuantity   Int              @default(0)
+  lowStockAlert   Int              @default(5)
+  unitOfSale      String           @default("piece") // piece, dozen, pack
+  isPublished     Boolean          @default(true)
+  isFeatured      Boolean          @default(false)
+  isNewArrival    Boolean          @default(false)
+  isIslamicCap    Boolean          @default(false)
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  images          ProductImage[]
+  variants        ProductVariant[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+}
+
+model ProductImage {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url        String
+  altText    String?
+  isPrimary  Boolean  @default(false)
+  displayOrder Int    @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model ProductVariant {
+  id           String      @id @default(cuid())
+  productId    String
+  product      Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku          String      @unique
+  nameBn       String?
+  nameEn       String?
+  size         String?     // e.g. "20", "21", "22", "M", "L"
+  color        String?     // e.g. "White", "Black", "Maroon"
+  price        Float?      // override base price if different
+  stock        Int         @default(0)
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+}
+
+// Cart & Cart Items
+model Cart {
+  id        String     @id @default(cuid())
+  guestId   String?    @unique
+  customerId String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+}
+
+model CartItem {
+  id        String          @id @default(cuid())
+  cartId    String
+  cart      Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  quantity  Int             @default(1)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+// Orders & Fulfillments
+model Order {
+  id              String              @id @default(cuid())
+  orderNumber     String              @unique // e.g. SS-20261125-001
+  customerId      String?
+  customer        Customer?           @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  guestName       String
+  guestPhone      String
+  guestAltPhone   String?
+  guestEmail      String?
+  district        String
+  upazila         String
+  fullAddress     String
+  orderNotes      String?
+  subtotal        Float
+  discount        Float               @default(0)
+  deliveryCharge  Float               @default(0)
+  totalAmount     Float
+  status          String              @default("PENDING") // PENDING, CONFIRMED, PROCESSING, PACKED, SHIPPED, DELIVERED, CANCELLED, RETURNED
+  paymentStatus   String              @default("UNPAID")  // UNPAID, PENDING_VERIFICATION, PARTIALLY_PAID, PAID, REJECTED, REFUNDED
+  paymentMethod   String              @default("COD")     // COD, BKASH, NAGAD, BANK_TRANSFER
+  deliveryZone    String              @default("INSIDE_DHAKA") // INSIDE_DHAKA, OUTSIDE_DHAKA
+  courierName     String?
+  trackingNumber  String?
+  internalNotes   String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  items           OrderItem[]
+  statusHistory   OrderStatusHistory[]
+  payments        Payment[]
+}
+
+model OrderItem {
+  id              String          @id @default(cuid())
+  orderId         String
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String?
+  product         Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId       String?
+  variant         ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productNameBn   String
+  productNameEn   String
+  variantName     String?
+  sku             String
+  unitPrice       Float
+  quantity        Int
+  totalPrice      Float
+  createdAt       DateTime        @default(now())
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    String
+  note      String?
+  changedBy String?
+  createdAt DateTime @default(now())
+}
+
+// Payments & Verifications
+model Payment {
+  id              String               @id @default(cuid())
+  orderId         String
+  order           Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method          String               // BKASH, NAGAD, COD, BANK_TRANSFER
+  amount          Float
+  transactionId   String?              @unique
+  accountNumber   String?              // Sender's or receiver's account number
+  proofImageUrl   String?
+  status          String               @default("PENDING") // PENDING, VERIFIED, REJECTED, REFUNDED
+  verifiedAt      DateTime?
+  verifiedBy      String?
+  rejectionReason String?
+  notes           String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  refunds         Refund[]
+}
+
+model Refund {
+  id          String   @id @default(cuid())
+  paymentId   String
+  payment     Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  amount      Float
+  reason      String
+  processedBy String
+  createdAt   DateTime @default(now())
+}
+
+// Delivery Configurations
+model DeliveryZone {
+  id           String         @id @default(cuid())
+  nameBn       String
+  nameEn       String
+  slug         String         @unique
+  baseRate     Float
+  estimatedDays String        @default("2-3 days")
+  isActive     Boolean        @default(true)
+  rates        DeliveryRate[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model DeliveryRate {
+  id             String       @id @default(cuid())
+  zoneId         String
+  zone           DeliveryZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  districtNameBn String
+  districtNameEn String
+  rate           Float
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+// Wholesale & Institutional Inquiries & Quotations
+model WholesaleInquiry {
+  id             String      @id @default(cuid())
+  customerName   String
+  institutionName String?
+  phone          String
+  whatsapp       String?
+  district       String
+  address        String
+  productDetails String
+  quantityNeeded String
+  additionalNotes String?
+  status         String      @default("NEW") // NEW, CONTACTED, QUOTATION_PREPARED, NEGOTIATION, ACCEPTED, REJECTED, COMPLETED
+  adminNotes     String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  customerId     String?
+  customer       Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  quotations     Quotation[]
+}
+
+model Quotation {
+  id              String            @id @default(cuid())
+  quotationNumber String            @unique
+  inquiryId       String?
+  inquiry         WholesaleInquiry? @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+  customerName    String
+  institutionName String?
+  phone           String
+  subtotal        Float
+  discount        Float             @default(0)
+  deliveryCharge  Float             @default(0)
+  totalAmount     Float
+  notes           String?
+  validUntil      DateTime
+  status          String            @default("DRAFT") // DRAFT, SENT, ACCEPTED, REJECTED, CONVERTED_TO_ORDER
+  createdById     String?
+  createdBy       User?             @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  items           QuotationItem[]
+}
+
+model QuotationItem {
+  id           String    @id @default(cuid())
+  quotationId  String
+  quotation    Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  productName  String
+  quantity     Int
+  unitPrice    Float
+  discount     Float     @default(0)
+  totalPrice   Float
+  createdAt    DateTime  @default(now())
+}
+
+// Coupons & Promotions
+model Coupon {
+  id             String        @id @default(cuid())
+  code           String        @unique
+  type           String        @default("PERCENTAGE") // PERCENTAGE, FIXED_AMOUNT
+  discountValue  Float
+  minOrderAmount Float?        @default(0)
+  maxDiscount    Float?
+  startDate      DateTime      @default(now())
+  endDate        DateTime?
+  usageLimit     Int?
+  usageCount     Int           @default(0)
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  usages         CouponUsage[]
+}
+
+model CouponUsage {
+  id        String   @id @default(cuid())
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  orderId   String
+  userPhone String
+  createdAt DateTime @default(now())
+}
+
+// CMS & Banners
+model HeroBanner {
+  id           String   @id @default(cuid())
+  badgeBn      String   @default("সুন্নাহর অনুসরণে, দৈনন্দিন প্রয়োজনে")
+  badgeEn      String   @default("In Sunnah Tradition, For Daily Life")
+  titleBn      String   @default("মানসম্মত ইসলামি")
+  titleEn      String   @default("Premium Islamic")
+  subtitleBn   String   @default("টুপি, পাগড়ি, রুমাল, তসবিহ ও কোরআনের গিলাফ")
+  subtitleEn   String   @default("Caps, Turbans, Scarves, Tasbih & Quran Covers")
+  descriptionBn String  @default("মসজিদ, মাদ্রাসা ও ব্যক্তিগত ব্যবহারের জন্য নির্বাচিত ও নির্ভরযোগ্য পণ্য।")
+  descriptionEn String  @default("Selected and trustworthy products for mosques, madrasas, and personal use.")
+  ctaTextBn    String   @default("এখনই অর্ডার করুন")
+  ctaTextEn    String   @default("Order Now")
+  ctaLink      String   @default("/shop")
+  imageUrl     String?  // collage visual
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model HomepageSection {
+  id           String   @id @default(cuid())
+  sectionKey   String   @unique // e.g. "HERO", "TRUST_STRIP", "CATEGORIES", "FEATURED_PRODUCTS", "CAP_COLLECTION", "WHOLESALE_BANNERS"
+  titleBn      String
+  titleEn      String
+  isVisible    Boolean  @default(true)
+  displayOrder Int      @default(0)
+  contentJson  String?  // optional custom config JSON
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PromotionalBanner {
+  id           String   @id @default(cuid())
+  position     String   // "WHOLESALE_LEFT", "WHOLESALE_RIGHT", "HOMEPAGE_TOP"
+  titleBn      String
+  titleEn      String
+  subtitleBn   String?
+  subtitleEn   String?
+  ctaTextBn    String?
+  ctaTextEn    String?
+  ctaLink      String?
+  imageUrl     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model NavigationItem {
+  id           String   @id @default(cuid())
+  labelBn      String
+  labelEn      String
+  url          String
+  iconName     String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContentPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  titleBn     String
+  titleEn     String
+  contentBn   String
+  contentEn   String
+  isPublished Boolean  @default(true)
+  seoTitle    String?
+  seoDesc     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Media Library
+model MediaAsset {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileUrl   String
+  fileType  String   // e.g. "image/jpeg", "image/png"
+  fileSize  Int
+  altText   String?
+  category  String   @default("product") // product, category, banner, logo, icon
+  createdAt DateTime @default(now())
+}
+
+// Business Settings & Config
+model BusinessSettings {
+  id                String   @id @default("default")
+  businessNameBn    String   @default("সাদ সুহাইব সুন্নাহ শপ")
+  businessNameEn    String   @default("Saad Suhaib Sunnah Shop")
+  taglineBn         String   @default("সুন্নাহসম্মত ও প্রয়োজনীয় ইসলামি পণ্যের বিশ্বস্ত ঠিকানা")
+  taglineEn         String   @default("Trusted destination for Sunnah-compliant & essential Islamic products")
+  announcementBn    String   @default("মসজিদ, মাদ্রাসা ও সাধারণ মুসলিম ভাইদের বিশ্বস্ত ইসলামি পণ্যের অনলাইন শপ")
+  announcementEn    String   @default("Online shop of trusted Islamic products for mosques, madrasas & Muslims")
+  phoneSupport      String   @default("+880 1749160444")
+  whatsappNumber    String   @default("+880 1749160444")
+  whatsappUrl       String   @default("https://wa.me/8801749160444")
+  facebookUrl       String   @default("https://www.facebook.com/profile.php?id=61571320383081")
+  addressBn         String?  @default("টাঙ্গাইল সদর কলেজ মোড় থেকে আইডিয়াল কলেজ রোড, একতালা বাম, বাংলাদেশ")
+  addressEn         String?  @default("Tangail Sadar College More to Ideal College Road, 1st Floor Left, Bangladesh")
+  insideDhakaRate   Float    @default(70)
+  outsideDhakaRate  Float    @default(130)
+  bkashNumber       String   @default("+880 1749160444 (Personal / Send Money)")
+  nagadNumber       String   @default("+880 1749160444 (Personal / Send Money)")
+  bankDetails       String?  @default("Islami Bank Bangladesh PLC (Account details pending client confirmation)")
+  isCodEnabled      Boolean  @default(true)
+  isBkashEnabled    Boolean  @default(true)
+  isNagadEnabled    Boolean  @default(true)
+  isBankEnabled     Boolean  @default(false)
+  updatedAt         DateTime @updatedAt
+}
+
+// System Audit Logs
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // e.g. "CREATE_PRODUCT", "UPDATE_ORDER", "VERIFY_PAYMENT"
+  entity    String   // e.g. "Product", "Order", "Payment"
+  entityId  String?
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}

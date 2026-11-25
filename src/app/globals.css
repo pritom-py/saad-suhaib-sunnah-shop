@@ -1,0 +1,294 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --emerald-black: #001c13;
+  --emerald-deep: #002b1d;
+  --emerald-primary: #063d2b;
+  --emerald-light: #176044;
+
+  --maroon-deep: #490609;
+  --maroon-primary: #780e15;
+  --maroon-light: #a42127;
+
+  --gold-dark: #8c5a0a;
+  --gold-bronze: #b47b19;
+  --gold-primary: #d4af37;
+  --gold-light: #f6d77a;
+  --gold-highlight: #fff2c2;
+
+  --ivory: #fffcf3;
+  --cream: #f7efdc;
+  --white: #ffffff;
+
+  --gold-gradient: linear-gradient(135deg, #8c5a0a 0%, #c69532 18%, #f6d77a 36%, #fff2c2 48%, #e9bc52 65%, #b47b19 85%, #8c5a0a 100%);
+  --gold-button-gradient: linear-gradient(180deg, #fff0b7 0%, #f6d77a 45%, #dca63a 100%);
+  --emerald-gradient: linear-gradient(135deg, #001c13 0%, #063d2b 55%, #12563d 100%);
+  --maroon-gradient: linear-gradient(135deg, #490609 0%, #780e15 50%, #a42127 100%);
+  --ivory-gradient: linear-gradient(180deg, #ffffff 0%, #fffcf3 50%, #f7efdc 100%);
+
+  --gold-glow: 0 4px 20px rgba(212, 175, 55, 0.18);
+  --premium-shadow: 0 8px 28px rgba(0, 43, 29, 0.12);
+
+  --text-primary: #18231d;
+  --text-secondary: #4f5a53;
+  --border: #e8dab5;
+}
+
+body {
+  color: var(--text-primary);
+  background-color: var(--ivory);
+  font-family: var(--font-hind), var(--font-noto), system-ui, sans-serif;
+  overflow-x: clip;
+}
+
+::selection {
+  background: #f6d77a;
+  color: #001c13;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: #f7efdc;
+}
+::-webkit-scrollbar-thumb {
+  background: #b47b19;
+  border-radius: 6px;
+}
+
+@layer components {
+  /* ---------- layout ---------- */
+  .shell {
+    width: 100%;
+    max-width: 1360px;
+    margin-inline: auto;
+    padding-inline: clamp(12px, 2.3vw, 36px);
+  }
+
+  /* ---------- surfaces ---------- */
+  .page-ivory {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--ivory);
+  }
+  .page-ivory::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: url("/patterns/islamic-star-pattern.svg") repeat;
+    opacity: 0.09;
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 24%, transparent 76%, #000 100%);
+    mask-image: linear-gradient(90deg, #000 0%, transparent 24%, transparent 76%, #000 100%);
+  }
+
+  .premium-card {
+    background: var(--ivory-gradient);
+    border: 1px solid rgba(180, 123, 25, 0.28);
+    border-radius: 16px;
+    box-shadow: 0 3px 10px rgba(0, 43, 29, 0.06);
+  }
+
+  .premium-product-card {
+    background: var(--ivory-gradient);
+    border: 1px solid rgba(180, 123, 25, 0.28);
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0, 43, 29, 0.08);
+    transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+  }
+  .premium-product-card:hover {
+    transform: translateY(-4px);
+    border-color: #d4af37;
+    box-shadow: 0 12px 28px rgba(0, 43, 29, 0.14);
+  }
+
+  /* ---------- buttons ---------- */
+  .gold-button {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--gold-button-gradient);
+    border: 1px solid #e8c66b;
+    color: #182014;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.65), 0 4px 12px rgba(140, 90, 10, 0.2);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .gold-button:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7), 0 6px 20px rgba(140, 90, 10, 0.28);
+  }
+
+  .btn-emerald {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    background: linear-gradient(180deg, #12563d 0%, #063d2b 52%, #002b1d 100%);
+    color: #fffcf3;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 9px;
+    font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 242, 194, 0.18), 0 3px 8px rgba(0, 43, 29, 0.2);
+    transition: transform 160ms ease, box-shadow 200ms ease, filter 200ms ease;
+  }
+  .btn-emerald:hover {
+    filter: brightness(1.14);
+    box-shadow: inset 0 1px 0 rgba(255, 242, 194, 0.25), 0 6px 16px rgba(0, 43, 29, 0.26);
+  }
+  .btn-emerald:active,
+  .gold-button:active {
+    transform: translateY(1px) scale(0.985);
+  }
+  .btn-emerald:disabled,
+  .gold-button:disabled {
+    background: #dcd8cc;
+    border-color: #cfcabb;
+    color: #6f6c63;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
+  }
+
+  /* shine sweep on hover */
+  .gold-button::after,
+  .btn-emerald::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    left: -60%;
+    transform: skewX(-18deg);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .gold-button:hover::after {
+    animation: shine 700ms ease;
+  }
+  .btn-emerald:hover::after {
+    animation: shine 700ms ease;
+    filter: opacity(0.45);
+  }
+
+  /* ---------- gold text & lines ---------- */
+  .gold-text {
+    background: linear-gradient(180deg, #fff2c2 0%, #f6d77a 35%, #d4af37 65%, #b47b19 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* room for Bengali matras so the clipped gradient never cuts them */
+    padding-block: 0.08em;
+  }
+  .gold-line {
+    height: 2px;
+    background: var(--gold-gradient);
+  }
+
+  /* ---------- Islamic ornament helpers ---------- */
+  .pattern-stars {
+    background-image: url("/patterns/islamic-star-pattern.svg");
+  }
+  .pattern-geometric {
+    background-image: url("/patterns/islamic-geometric.svg");
+  }
+  .pattern-arabesque {
+    background-image: url("/patterns/gold-arabesque.svg");
+  }
+  .mosque {
+    pointer-events: none;
+    background: linear-gradient(180deg, #e9bc52 0%, #b47b19 100%);
+    -webkit-mask: url("/decorations/mosque-silhouette.svg") bottom center / contain no-repeat;
+    mask: url("/decorations/mosque-silhouette.svg") bottom center / contain no-repeat;
+  }
+
+  .emerald-surface {
+    background: radial-gradient(120% 140% at 50% 0%, #0b4a34 0%, #063d2b 38%, #002b1d 72%, #001c13 100%);
+  }
+
+  /* ---------- forms ---------- */
+  .field {
+    width: 100%;
+    background: #fffdf7;
+    border: 1px solid #e3d3a8;
+    border-radius: 10px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .field:focus {
+    outline: none;
+    border-color: #b47b19;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22);
+  }
+
+  .skeleton {
+    background: linear-gradient(100deg, #f3ead3 30%, #fffaeb 50%, #f3ead3 70%);
+    background-size: 220% 100%;
+    animation: shimmer 1.3s linear infinite;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+}
+
+@keyframes shine {
+  0% { left: -60%; opacity: 1; }
+  100% { left: 130%; opacity: 1; }
+}
+@keyframes shimmer {
+  from { background-position: 120% 0; }
+  to { background-position: -120% 0; }
+}
+/* movement only: a section must stay readable even if the timeline never advances */
+@keyframes settle {
+  from { transform: translateY(16px); }
+  to { transform: none; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Section entrance: only where scroll-driven animations exist, so content is never left hidden */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: settle linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 22%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    animation: none;
+  }
+}
+
+@media print {
+  nav, footer, header { display: none !important; }
+}
