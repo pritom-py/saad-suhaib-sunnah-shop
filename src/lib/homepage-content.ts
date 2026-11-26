@@ -1,18 +1,18 @@
 /** CMS-editable homepage copy stored in HomepageSection.contentJson, with safe defaults. */
 
 export interface TrustItem {
-  icon: "truck" | "shield" | "card" | "package";
+  icon: "award" | "truck" | "shield" | "card" | "package" | "headset";
   title: string;
+  subtitle?: string;
   href?: string;
 }
 
 export const DEFAULT_TRUST_ITEMS: TrustItem[] = [
-  { icon: "truck", title: "সারা বাংলাদেশে ডেলিভারি", href: "/delivery-policy" },
-  { icon: "shield", title: "বিশ্বস্ত ও মানসম্মত পণ্য" },
-  { icon: "card", title: "বিকাশ ও নগদ পেমেন্ট সুবিধা" },
-  // The return policy is still marked "pending client confirmation", so this links to the policy
-  // instead of promising a facility. Change the title in Admin → CMS once it is confirmed.
-  { icon: "package", title: "রিটার্ন ও এক্সচেঞ্জ নীতি", href: "/return-policy" },
+  { icon: "award", title: "মানসম্মত পণ্য", subtitle: "বাছাই করা সংগ্রহ" },
+  { icon: "truck", title: "সারা দেশে ডেলিভারি", subtitle: "ডেলিভারি নীতি দেখুন", href: "/delivery-policy" },
+  // The return policy is still marked "pending client confirmation": link to it, promise no number of days.
+  { icon: "package", title: "রিটার্ন ও এক্সচেঞ্জ", subtitle: "নীতি দেখুন", href: "/return-policy" },
+  { icon: "headset", title: "গ্রাহক সেবা", subtitle: "যেকোনো প্রশ্নে যোগাযোগ করুন", href: "/contact" },
 ];
 
 export const DEFAULT_CATEGORY_SUBTITLES: Record<string, string> = {

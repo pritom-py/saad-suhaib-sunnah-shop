@@ -88,7 +88,11 @@ export function SearchAutocomplete() {
 
   return (
     <div ref={boxRef} className="relative w-full">
-      <form onSubmit={submit} role="search" className="flex h-10 overflow-hidden rounded-[9px] border border-[#cfa74a] bg-white shadow-[0_3px_10px_rgba(140,90,10,0.14)] focus-within:ring-2 focus-within:ring-[#d4af37]/40 xl:h-11">
+      <form
+        onSubmit={submit}
+        role="search"
+        className="flex h-10 overflow-hidden rounded-md bg-white border border-[#E3D6BC] focus-within:border-[#B68A3E] focus-within:ring-1 focus-within:ring-[#B68A3E]"
+      >
         <input
           value={query}
           onChange={(e) => {
@@ -103,23 +107,31 @@ export function SearchAutocomplete() {
           aria-autocomplete="list"
           aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
           aria-label="পণ্য খুঁজুন"
-          placeholder="আপনার পছন্দের পণ্য খুঁজুন..."
-          className="min-w-0 flex-1 bg-transparent px-3.5 text-[13px] text-[#18231d] placeholder:text-[#70746e] focus:outline-none xl:text-[15px]"
+          placeholder="পণ্য খুঁজুন (যেমন: টুপি, পাগড়ি, রুমাল...)"
+          className="min-w-0 flex-1 bg-transparent px-3 text-[13px] text-[#14291B] placeholder:text-[#746B5B]/70 focus:outline-none"
         />
-        <button type="submit" aria-label="অনুসন্ধান করুন" className="flex w-12 items-center justify-center bg-gradient-to-b from-[#12563d] to-[#002b1d] text-[#f6d77a] transition hover:brightness-125 xl:w-14">
-          <Search className="h-[18px] w-[18px]" strokeWidth={2.4} />
+        <button
+          type="submit"
+          aria-label="অনুসন্ধান করুন"
+          className="flex w-10 sm:w-11 items-center justify-center text-[#746B5B] hover:text-[#082B13] transition-colors"
+        >
+          <Search className="h-4 w-4 text-[#746B5B]" strokeWidth={2} />
         </button>
       </form>
 
       {showPanel && (
-        <div id={listId} role="listbox" className="absolute inset-x-0 top-full z-[70] mt-1.5 overflow-hidden rounded-xl border border-[#d9bd72] bg-[#fffcf3] shadow-[0_18px_40px_rgba(0,43,29,0.22)] motion-safe:animate-[rise_180ms_ease]">
+        <div
+          id={listId}
+          role="listbox"
+          className="absolute inset-x-0 top-full z-[70] mt-1 overflow-hidden rounded-lg border border-[#E3D6BC] bg-[#FCF7EA] shadow-lg"
+        >
           {status === "loading" && (
-            <p className="flex items-center gap-2 px-3 py-3 text-sm text-[#4f5a53]">
-              <Loader2 className="h-4 w-4 animate-spin text-[#b47b19]" /> খোঁজা হচ্ছে...
+            <p className="flex items-center gap-2 px-3 py-2.5 text-xs text-[#746B5B]">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-[#B68A3E]" /> খোঁজা হচ্ছে...
             </p>
           )}
-          {status === "error" && <p className="px-3 py-3 text-sm text-[#780e15]">অনুসন্ধান করা যায়নি। আবার চেষ্টা করুন।</p>}
-          {status === "done" && results.length === 0 && <p className="px-3 py-3 text-sm text-[#4f5a53]">কোনো পণ্য পাওয়া যায়নি।</p>}
+          {status === "error" && <p className="px-3 py-2 text-xs text-[#710D17]">অনুসন্ধান করা যায়নি।</p>}
+          {status === "done" && results.length === 0 && <p className="px-3 py-2 text-xs text-[#746B5B]">কোনো পণ্য পাওয়া যায়নি।</p>}
           {status === "done" &&
             results.map((p, i) => (
               <Link
@@ -130,13 +142,13 @@ export function SearchAutocomplete() {
                 href={`/product/${p.slug}`}
                 onClick={() => setOpen(false)}
                 onMouseEnter={() => setActive(i)}
-                className={`flex items-center gap-3 border-b border-[#efe3c1] px-3 py-2 last:border-0 ${active === i ? "bg-[#f7efdc]" : ""}`}
+                className={`flex items-center gap-3 border-b border-[#E3D6BC]/50 px-3 py-2 last:border-0 ${active === i ? "bg-[#F4EAD7]" : ""}`}
               >
-                <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-md border border-[#e3d3a8] bg-[#f7efdc]">
-                  {p.images[0] && <Image src={p.images[0].url} alt="" fill sizes="44px" className="object-cover" />}
+                <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded border border-[#E3D6BC] bg-white">
+                  {p.images[0] && <Image src={p.images[0].url} alt="" fill sizes="36px" className="object-cover" />}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[#063d2b]">{p.nameBn}</span>
-                <span className="shrink-0 text-sm font-bold text-[#780e15]">
+                <span className="min-w-0 flex-1 truncate text-xs font-semibold text-[#082B13]">{p.nameBn}</span>
+                <span className="shrink-0 text-xs font-bold text-[#710D17]">
                   {p.regularPrice === null ? "যোগাযোগ" : formatPrice(p.regularPrice)}
                 </span>
               </Link>

@@ -1,56 +1,51 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { SectionHeading } from "./SectionHeading";
-import { DEFAULT_CATEGORY_SUBTITLES } from "@/lib/homepage-content";
+import { SectionTitle } from "./SectionTitle";
 
-interface CategoryCardData {
+interface CategoryData {
   slug: string;
   nameBn: string;
   imageUrl: string | null;
 }
 
-export function CategoryCard({ category, subtitle }: { category: CategoryCardData; subtitle?: string }) {
-  return (
-    <Link
-      href={`/category/${category.slug}`}
-      className="group relative block rounded-[18px] border border-[#d9bd72]/70 p-[3px] shadow-[0_5px_14px_rgba(0,43,29,0.16)] transition duration-300 [background:var(--ivory-gradient)] hover:-translate-y-1 hover:border-[#d4af37] hover:shadow-[0_14px_28px_rgba(0,43,29,0.24)]"
-    >
-      <span className="relative block aspect-[180/177] overflow-hidden rounded-[15px] bg-[#f7efdc]">
-        {category.imageUrl && (
-          <Image
-            src={category.imageUrl}
-            alt={category.nameBn}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-          />
-        )}
-      </span>
-      <span className="absolute inset-x-[5px] bottom-[5px] flex min-h-[30%] flex-col items-center justify-center rounded-[12px] border border-[#d4af37]/40 bg-gradient-to-b from-[#0d5a3f] via-[#063d2b] to-[#002b1d] px-1 py-1 text-center shadow-[0_-3px_10px_rgba(0,28,19,0.3)]">
-        <span className="font-bold leading-snug text-white text-[clamp(14px,1.35vw,20px)]">{category.nameBn}</span>
-        {subtitle && <span className="leading-snug text-[#f3ecd6] text-[clamp(10.5px,0.98vw,14px)]">{subtitle}</span>}
-      </span>
-    </Link>
-  );
-}
+/** The five tiles of the approved design. Artwork is built from the shop's own product photos. */
+const TILES = [
+  { slug: "caps", label: "টুপি", art: "caps" },
+  { slug: "turbans", label: "পাগড়ি", art: "turbans" },
+  { slug: "scarves", label: "রুমাল", art: "scarves" },
+  { slug: "tasbih", label: "ডিজিটাল তসবিহ", art: "tasbih" },
+  { slug: "quran-covers", label: "কোরআনের গিলাফ", art: "others" },
+];
 
-export function CategorySection({
-  categories,
-  subtitles = DEFAULT_CATEGORY_SUBTITLES,
-}: {
-  categories: CategoryCardData[];
-  subtitles?: Record<string, string>;
-}) {
-  if (!categories.length) return null;
+export function CategorySection({ categories, subtitles = {} }: { categories: CategoryData[]; subtitles?: Record<string, string> }) {
+  const tiles = TILES.flatMap((tile) => {
+    const category = categories.find((c) => c.slug === tile.slug);
+    if (!category) return [];
+    // A picture chosen in the admin replaces the built artwork.
+    const custom = category.imageUrl && category.imageUrl !== `/categories/${tile.slug}.jpg` ? category.imageUrl : null;
+    return [{ ...tile, custom }];
+  });
+
   return (
-    <section className="reveal shell pt-[clamp(14px,1.8vw,32px)]">
-      <SectionHeading title="পণ্য ক্যাটাগরি" />
-      <ul className="mt-[clamp(8px,1vw,20px)] grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-[clamp(14px,1.7vw,26px)] lg:px-[clamp(0px,0.9vw,14px)]">
-        {categories.slice(0, 5).map((cat, i) => (
-          // the fifth card spans the row on two-column phones so the grid stays balanced
-          <li key={cat.slug} className={i === 4 ? "col-span-2 mx-auto w-[calc(50%-6px)] sm:col-span-1 sm:w-auto sm:mx-0" : ""}>
-            <CategoryCard category={cat} subtitle={subtitles[cat.slug]} />
+    <section className="shell pb-6 pt-5 sm:pb-8 sm:pt-7">
+      <SectionTitle title="আমাদের সংগ্রহ" />
+      <ul className="flex flex-wrap justify-center gap-x-3 gap-y-4 sm:gap-x-5">
+        {tiles.map((tile) => (
+          <li key={tile.slug} className="reveal-item w-[calc(33.333%-8px)] sm:w-[calc(20%-16px)]">
+            <Link href={`/category/${tile.slug}`} className="group flex flex-col items-center">
+              <span className="relative block aspect-[480/580] w-full transition-all duration-500 group-hover:-translate-y-2 group-hover:drop-shadow-[0_0_16px_rgba(214,173,96,0.75)]">
+                {tile.custom ? (
+                  <span className="absolute inset-0 overflow-hidden rounded-b-lg rounded-t-[999px] border-[3px] border-[#B68A3E] bg-[#082B13]">
+                    <Image src={tile.custom} alt="" fill sizes="(max-width: 640px) 33vw, 20vw" className="object-cover" />
+                  </span>
+                ) : (
+                  <Image src={`/categories/arch/${tile.art}.webp`} alt="" fill sizes="(max-width: 640px) 33vw, 20vw" className="object-contain drop-shadow-[0_8px_10px_rgba(4,27,12,0.22)] transition-transform duration-500 group-hover:scale-[1.03]" />
+                )}
+              </span>
+              <span className="mt-2 text-center text-[clamp(13px,1.5vw,21px)] font-bold leading-snug text-[#082B13] group-hover:text-[#710D17]">{tile.label}</span>
+              {subtitles[tile.slug] && <span className="text-center text-xs text-[#746B5B]">{subtitles[tile.slug]}</span>}
+            </Link>
           </li>
         ))}
       </ul>

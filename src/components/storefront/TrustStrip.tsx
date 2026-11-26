@@ -1,38 +1,32 @@
 import React from "react";
 import Link from "next/link";
-import { Truck, ShieldCheck, CreditCard, Package, type LucideIcon } from "lucide-react";
+import { Award, CreditCard, Headphones, Package, ShieldCheck, Truck } from "lucide-react";
 import { DEFAULT_TRUST_ITEMS, type TrustItem } from "@/lib/homepage-content";
 
-const ICONS: Record<string, LucideIcon> = { truck: Truck, shield: ShieldCheck, card: CreditCard, package: Package };
+const ICONS = { award: Award, truck: Truck, shield: ShieldCheck, card: CreditCard, package: Package, headset: Headphones };
 
 export function TrustStrip({ items = DEFAULT_TRUST_ITEMS }: { items?: TrustItem[] }) {
   return (
-    <section aria-label="আমাদের সেবা" className="shell pt-2.5">
-      <svg width="0" height="0" className="absolute" aria-hidden>
-        <linearGradient id="icon-gold" gradientUnits="userSpaceOnUse" x1="2" y1="2" x2="22" y2="22">
-          <stop offset="0" stopColor="#8C5A0A" />
-          <stop offset="0.45" stopColor="#D9AC3F" />
-          <stop offset="0.6" stopColor="#E9BC52" />
-          <stop offset="1" stopColor="#8C5A0A" />
-        </linearGradient>
-      </svg>
-      <ul className="premium-card grid grid-cols-2 !rounded-[14px] py-1 lg:grid-cols-4 lg:py-0">
+    <section aria-label="আমাদের বিশেষত্ব" className="border-y border-[#E3D6BC] bg-[linear-gradient(180deg,#FCF7EA,#F4EAD7)]">
+      <ul className="shell grid grid-cols-2 lg:grid-cols-4">
         {items.slice(0, 4).map((item, i) => {
-          const Icon = ICONS[item.icon] || ShieldCheck;
+          const Icon = ICONS[item.icon] || Award;
           const body = (
             <>
-              <Icon className="shrink-0 h-[clamp(30px,3.4vw,48px)] w-[clamp(30px,3.4vw,48px)]" stroke="url(#icon-gold)" strokeWidth={1.7} />
-              <span className="max-w-[8.4em] text-balance font-bold leading-snug text-[#16221c] text-[clamp(13px,1.32vw,18px)]">{item.title}</span>
+              <Icon aria-hidden className="h-8 w-8 shrink-0 text-[#A67C35] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110 sm:h-10 sm:w-10" strokeWidth={1.4} />
+              <span className="flex min-w-0 flex-col">
+                <span className="text-[clamp(13px,1.3vw,18px)] font-bold leading-snug text-[#082B13]">{item.title}</span>
+                {item.subtitle && <span className="text-[clamp(11.5px,1vw,14px)] leading-snug text-[#746B5B]">{item.subtitle}</span>}
+              </span>
             </>
           );
-          const cls = "flex h-full w-full items-center justify-center gap-[clamp(8px,1.4vw,20px)] px-2.5 py-2.5";
+          const cell = "flex h-full items-center gap-2.5 py-3.5 sm:justify-center sm:gap-3.5 sm:py-5";
           return (
-            <li key={i} className="relative flex min-h-[64px] items-center lg:min-h-[clamp(66px,6.3vw,96px)]">
-              {i > 0 && <span aria-hidden className={`absolute left-0 top-[18%] h-[64%] w-px bg-gradient-to-b from-transparent via-[#c69532] to-transparent ${i === 2 ? "hidden lg:block" : ""}`} />}
+            <li key={i} className={`reveal-item group min-w-0 px-1.5 ${i % 2 ? "border-l border-[#E3D6BC]" : ""} ${i === 2 ? "lg:border-l lg:border-[#E3D6BC]" : ""}`}>
               {item.href ? (
-                <Link href={item.href} className={`${cls} rounded-lg transition-colors hover:bg-[#f7efdc]/60`}>{body}</Link>
+                <Link href={item.href} className={`${cell} hover:opacity-80`}>{body}</Link>
               ) : (
-                <div className={cls}>{body}</div>
+                <div className={cell}>{body}</div>
               )}
             </li>
           );

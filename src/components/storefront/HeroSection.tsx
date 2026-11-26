@@ -3,9 +3,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ShoppingCart } from "lucide-react";
-import { GoldenIslamicArch } from "./GoldenIslamicArch";
+import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { toBengaliNumber } from "@/lib/locale";
+import { HeroStage, artFor } from "./HeroStage";
 
 export interface HeroSlide {
   id: string;
@@ -20,159 +20,204 @@ export interface HeroSlide {
 
 const FALLBACK: HeroSlide = {
   id: "fallback",
-  badgeBn: "সুন্নাহর অনুসরণে, দৈনন্দিন প্রয়োজনে",
-  titleBn: "মানসম্মত ইসলামি",
-  subtitleBn: "টুপি, পাগড়ি, রুমাল, তসবিহ ও কোরআনের গিলাফ",
-  descriptionBn: "মসজিদ, মাদ্রাসা ও ব্যক্তিগত ব্যবহারের জন্য নির্বাচিত ও নির্ভরযোগ্য পণ্য।",
-  ctaTextBn: "এখনই অর্ডার করুন",
+  badgeBn: "সুন্নাহ • রুচি • মান",
+  titleBn: "প্রিমিয়াম ইসলামিক",
+  subtitleBn: "টুপির সংগ্রহ",
+  descriptionBn: "ঐতিহ্য, রুচি ও আরামের সমন্বয়ে নির্বাচিত মানসম্মত টুপির সংগ্রহ",
+  ctaTextBn: "সংগ্রহ দেখুন",
   ctaLink: "/shop",
-  imageUrl: "/hero/hero-products.webp",
+  imageUrl: null,
 };
 
-/** decorative foliage at the right edge */
-function Leaves({ className }: { className: string }) {
-  const leaves = [
-    [92, 12, -35, 1], [70, 30, -70, 0.85], [96, 46, -5, 0.9], [62, 58, -105, 0.7], [84, 70, -55, 1.05],
-    [100, 92, 15, 0.8], [66, 96, -85, 0.9], [88, 116, -30, 0.75], [54, 122, -120, 0.6], [92, 140, -60, 0.85],
-  ];
-  return (
-    <svg viewBox="0 0 120 170" className={className} aria-hidden>
-      <path d="M122 4C96 30 92 90 108 168M104 40C88 46 74 44 62 36M102 96C88 104 74 106 58 100" stroke="#33481a" strokeWidth="2.5" fill="none" />
-      {leaves.map(([x, y, r, s], i) => (
-        <g key={i} transform={`translate(${x} ${y}) rotate(${r}) scale(${s})`}>
-          <path d="M0 0C10 -13 30 -13 44 0C30 13 10 13 0 0Z" fill={i % 3 === 0 ? "#5c7a26" : i % 3 === 1 ? "#44641d" : "#2f4c16"} />
-          <path d="M2 0H40" stroke="#a9bd62" strokeWidth="0.8" opacity="0.6" />
-        </g>
-      ))}
-    </svg>
-  );
-}
+const DURATION = 7000;
+const LEAVING = 800;
 
-function SlideVisual({ slide, priority }: { slide: HeroSlide; priority: boolean }) {
-  const isCutout = !!slide.imageUrl?.startsWith("/hero/");
+/** Bengali must be animated word by word: splitting letters would break the conjuncts. */
+function Words({ text, from }: { text: string; from: number }) {
   return (
     <>
-      <Image src="/hero/hero-scene.webp" alt="" fill sizes="(max-width: 1024px) 100vw, 62vw" priority={priority} className="object-cover object-bottom" />
-      {slide.imageUrl &&
-        (isCutout ? (
-          <div className="absolute bottom-[0.5%] left-[17%] right-[1.5%] top-[8%]">
-            <Image
-              src={slide.imageUrl}
-              alt="সাদা টুপি, চেক রুমাল, ভিআইপি হাজি রুমাল ও কম্পাসযুক্ত ডিজিটাল তসবিহ"
-              fill
-              sizes="(max-width: 1024px) 90vw, 52vw"
-              priority={priority}
-              className="object-contain object-bottom drop-shadow-[0_10px_14px_rgba(20,8,0,0.4)]"
-            />
-          </div>
-        ) : (
-          <div className="absolute bottom-[5%] left-[19%] right-[8%] top-[9%] overflow-hidden rounded-2xl border-[3px] border-[#e9bc52] shadow-[0_14px_30px_rgba(0,0,0,0.5)]">
-            <Image src={slide.imageUrl} alt={slide.titleBn} fill sizes="(max-width: 1024px) 80vw, 44vw" className="object-cover" />
-          </div>
-        ))}
+      {text.split(" ").map((word, i) => (
+        <React.Fragment key={`${word}-${i}`}>
+          {i > 0 && " "}
+          <span className="hero-word" style={{ animationDelay: `${from + i * 90}ms` }}>
+            {word}
+          </span>
+        </React.Fragment>
+      ))}
     </>
   );
 }
 
-export function HeroSection({ banners }: { banners?: HeroSlide[] }) {
-  const slides = banners && banners.length > 0 ? banners : [FALLBACK];
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const reduceMotion = useReducedMotion();
-  const dragStart = useRef<number | null>(null);
-  const count = slides.length;
-  const current = index % count;
-  const slide = slides[current];
+/** gold corner of the multifoil arch that frames the banner */
+function Corner({ className }: { className: string }) {
+  return (
+    <svg aria-hidden viewBox="0 0 160 160" className={`pointer-events-none absolute top-0 z-20 h-[clamp(64px,10vw,160px)] w-auto ${className}`}>
+      <path d="M0 0H160C132 4 112 12 104 30C80 24 58 36 56 58C34 56 18 72 22 94C8 100 2 122 0 160Z" fill="#041B0C" />
+      <path className="hero-draw" pathLength={1} d="M160 0C132 4 112 12 104 30C80 24 58 36 56 58C34 56 18 72 22 94C8 100 2 122 0 160" fill="none" stroke="#D5AD60" strokeWidth="3" />
+      <path className="hero-draw [animation-delay:250ms]" pathLength={1} d="M146 0C124 5 108 14 100 24C76 20 52 34 50 53C28 52 13 70 16 90C6 98 2 112 0 124" fill="none" stroke="#B68A3E" strokeWidth="1.4" opacity=".8" />
+    </svg>
+  );
+}
 
-  const go = useCallback((delta: number) => setIndex((i) => (i + delta + count) % count), [count]);
+export function HeroSection({ banners }: { banners?: HeroSlide[] }) {
+  const slides = banners?.length ? banners : [FALLBACK];
+  const count = slides.length;
+  const [{ current, previous }, setSlides] = useState({ current: 0, previous: null as number | null });
+  const [hovered, setHovered] = useState(false);
+  const [stopped, setStopped] = useState(false);
+  const [reduced, setReduced] = useState(false);
+  const section = useRef<HTMLElement>(null);
+  const dragStart = useRef<number | null>(null);
+  const slide = slides[current % count];
+  const paused = hovered || stopped || reduced;
+  // a short second line keeps the large two-line headline of the design
+  const shortSubtitle = slide.subtitleBn.length <= 22;
+
+  const show = useCallback(
+    (next: number) =>
+      setSlides((s) => {
+        const target = ((next % count) + count) % count;
+        return target === s.current ? s : { current: target, previous: s.current };
+      }),
+    [count],
+  );
 
   useEffect(() => {
-    if (count < 2 || paused || reduceMotion) return;
-    const t = setTimeout(() => go(1), 7000);
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (count < 2 || paused) return;
+    const t = setTimeout(() => show(current + 1), DURATION);
     return () => clearTimeout(t);
-  }, [current, count, paused, reduceMotion, go]);
+  }, [current, count, paused, show]);
+
+  useEffect(() => {
+    if (previous === null) return;
+    const t = setTimeout(() => setSlides((s) => ({ ...s, previous: null })), LEAVING);
+    return () => clearTimeout(t);
+  }, [previous, current]);
+
+  // the layers drift with the mouse: CSS variables avoid re-rendering on every move
+  const tilt = (x: number, y: number) => {
+    section.current?.style.setProperty("--mx", x.toFixed(3));
+    section.current?.style.setProperty("--my", y.toFixed(3));
+  };
+
+  const arrow =
+    "absolute top-1/2 z-30 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#D5AD60]/70 bg-[#041B0C]/55 text-[#F7E2AC] opacity-0 backdrop-blur-sm transition hover:scale-110 hover:bg-[#D5AD60] hover:text-[#082B13] focus-visible:opacity-100 group-hover/hero:opacity-100 lg:flex";
 
   return (
     <section
+      ref={section}
       aria-roledescription="carousel"
       aria-label="প্রধান ব্যানার"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === "ArrowRight") go(1);
-        if (e.key === "ArrowLeft") go(-1);
+        if (e.key === "ArrowRight") show(current + 1);
+        if (e.key === "ArrowLeft") show(current - 1);
       }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => {
+        setHovered(false);
+        tilt(0, 0);
+      }}
+      onMouseMove={(e) => {
+        if (reduced) return;
+        const box = e.currentTarget.getBoundingClientRect();
+        tilt((e.clientX - box.left) / box.width - 0.5, (e.clientY - box.top) / box.height - 0.5);
+      }}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
       onTouchStart={(e) => (dragStart.current = e.touches[0].clientX)}
       onTouchEnd={(e) => {
         if (dragStart.current === null || count < 2) return;
         const dx = e.changedTouches[0].clientX - dragStart.current;
-        if (Math.abs(dx) > 45) go(dx < 0 ? 1 : -1);
+        if (Math.abs(dx) > 45) show(current + (dx < 0 ? 1 : -1));
         dragStart.current = null;
       }}
-      className="emerald-surface relative overflow-hidden text-[#fffcf3] lg:h-[clamp(318px,31.2vw,520px)]"
+      className="group/hero relative flex flex-col overflow-hidden bg-[#0b3218] text-[#FCF7EA] lg:block lg:h-[clamp(470px,42vw,620px)]"
     >
-      <div aria-hidden className="pattern-geometric absolute inset-0 opacity-[0.13] [mask-image:radial-gradient(90%_100%_at_20%_40%,#000,transparent_85%)]" />
-      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_28%_45%,rgba(35,122,85,0.35),transparent_55%)]" />
+      <div aria-hidden className="pattern-geometric hero-pattern absolute inset-0 opacity-[0.09]" />
 
-      <div className="shell relative z-10 flex pb-5 pt-6 lg:h-full lg:items-center lg:py-0">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={slide.id}
-            initial={{ opacity: 0, x: reduceMotion ? 0 : -18 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            aria-live={paused ? "polite" : "off"}
-            className="w-full text-center lg:w-[41.5%] lg:pl-[clamp(8px,2.4vw,34px)] lg:text-left"
-          >
-            <p className="inline-block rounded-[10px] border border-[#f9e7ac] px-4 py-1.5 font-bold text-[#1d2208] shadow-[0_5px_14px_rgba(0,0,0,0.35)] [background:var(--gold-button-gradient)] text-[clamp(13px,1.38vw,21px)]">
-              {slide.badgeBn}
-            </p>
-            <h1 className="mt-[clamp(6px,0.8vw,14px)] font-bold">
-              <span className="gold-text block text-balance leading-[1.28] drop-shadow-[0_2px_0_rgba(0,0,0,0.25)] text-[clamp(32px,3.75vw,60px)]">
-                {slide.titleBn}
-              </span>
-              <span className="mx-auto block max-w-[13.4em] text-balance leading-[1.28] text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.4)] text-[clamp(22px,2.62vw,42px)] lg:mx-0">
-                {slide.subtitleBn}
-              </span>
-            </h1>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/decorations/golden-divider.svg" alt="" width={240} height={16} className="mx-auto my-[clamp(2px,0.5vw,10px)] w-[min(80%,340px)] lg:mx-0" />
-            <p className="mx-auto max-w-[23em] text-balance leading-relaxed text-[#f1ead6] text-[clamp(13.5px,1.3vw,20px)] lg:mx-0">
-              {slide.descriptionBn}
-            </p>
-            <Link href={slide.ctaLink || "/shop"} className="gold-button group mt-[clamp(10px,1.2vw,22px)] px-[clamp(18px,1.9vw,30px)] py-[clamp(7px,0.7vw,12px)] text-[clamp(15px,1.4vw,20px)]">
-              <ShoppingCart className="h-[1.15em] w-[1.15em]" strokeWidth={2.4} />
+      <HeroStage
+        art={artFor(slide.imageUrl)}
+        artKey={slide.id}
+        customImage={slide.imageUrl}
+        alt={slide.titleBn}
+        leaving={previous === null ? null : { art: artFor(slides[previous].imageUrl), key: slides[previous].id, customImage: slides[previous].imageUrl }}
+      />
+
+      <Corner className="left-0" />
+      <Corner className="right-0 -scale-x-100" />
+
+      <div className="shell relative z-10 order-1 pb-5 pt-9 lg:pointer-events-none lg:flex lg:h-full lg:items-center lg:py-0">
+        <div key={slide.id} aria-live={paused ? "polite" : "off"} className="w-full text-center lg:pointer-events-auto lg:w-[40%] lg:pl-[clamp(6px,1.6vw,28px)] lg:text-left">
+          <p className="hero-fade flex items-center justify-center gap-3 text-[clamp(14px,1.45vw,21px)] font-semibold text-[#EACB85] lg:justify-start">
+            <span aria-hidden className="hero-line h-px w-9 shrink-0 bg-[#B68A3E]" />
+            {slide.badgeBn}
+            <span aria-hidden className="hero-line h-px w-9 shrink-0 bg-[#B68A3E]" />
+          </p>
+          <h1 className="mt-2 font-bold [filter:drop-shadow(0_3px_8px_rgba(0,0,0,0.5))]">
+            <span className="block text-balance text-[clamp(32px,4.1vw,62px)] leading-[1.24] text-[#F7E2AC]">
+              <Words text={slide.titleBn} from={120} />
+            </span>
+            <span className={`block text-balance leading-[1.3] ${shortSubtitle ? "text-[clamp(32px,4.1vw,62px)] text-[#F7E2AC]" : "mt-1 text-[clamp(19px,2.1vw,31px)] text-white"}`}>
+              <Words text={slide.subtitleBn} from={320} />
+            </span>
+          </h1>
+          <p className="hero-fade mx-auto mt-3 max-w-[24em] text-balance text-[clamp(14px,1.35vw,20px)] leading-relaxed text-[#FCF7EA]/90 [animation-delay:620ms] [text-shadow:0_2px_6px_rgba(0,0,0,0.6)] lg:mx-0">
+            {slide.descriptionBn}
+          </p>
+          <div className="hero-fade mt-5 [animation-delay:760ms]">
+            <Link href={slide.ctaLink || "/shop"} className="gold-button shine shine-auto group !rounded-full px-8 py-2.5 text-[clamp(15px,1.35vw,20px)]">
               {slide.ctaTextBn}
-              <ArrowRight className="h-[1.15em] w-[1.15em] transition-transform group-hover:translate-x-1" strokeWidth={2.4} />
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />
             </Link>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        </div>
       </div>
 
-      {/* arch with the product composition: stacks under the text on small screens */}
-      <GoldenIslamicArch className="relative h-[clamp(210px,62vw,430px)] w-full lg:absolute lg:inset-y-0 lg:left-[39.5%] lg:right-0 lg:h-auto lg:w-auto">
-        <AnimatePresence initial={false}>
-          <motion.div key={slide.id} initial={{ opacity: 0, scale: reduceMotion ? 1 : 1.025 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.45 }} className="absolute inset-0">
-            <SlideVisual slide={slide} priority={current === 0} />
-          </motion.div>
-        </AnimatePresence>
-        <Leaves className="absolute -right-1 -top-2 h-[56%] w-auto" />
-        <Leaves className="absolute -bottom-6 -right-2 h-[48%] w-auto -scale-y-100" />
-        <div aria-hidden className="absolute inset-0 shadow-[inset_0_0_60px_rgba(20,8,0,0.45)]" />
-      </GoldenIslamicArch>
-
       {count > 1 && (
-        <div className="absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 items-center lg:left-[48.5%]">
-          {slides.map((s, i) => (
-            <button key={s.id} onClick={() => setIndex(i)} aria-label={`স্লাইড ${i + 1}`} aria-current={i === current} className="p-[5px]">
-              <span className={`block h-[9px] w-[9px] rounded-full shadow transition-all ${i === current ? "scale-110 [background:var(--gold-button-gradient)]" : "bg-[#fffcf3]/80"}`} />
+        <>
+          <button type="button" onClick={() => show(current - 1)} aria-label="আগের স্লাইড" className={`${arrow} left-3`}>
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button type="button" onClick={() => show(current + 1)} aria-label="পরের স্লাইড" className={`${arrow} right-3`}>
+            <ChevronRight className="h-6 w-6" />
+          </button>
+
+          <div className="absolute bottom-2.5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-[#B68A3E]/40 bg-[#041B0C]/60 px-2 py-1 backdrop-blur-sm">
+            {slides.map((s, i) => (
+              <button key={s.id} type="button" onClick={() => show(i)} aria-label={`স্লাইড ${i + 1}`} aria-current={i === current} className="p-[5px]">
+                <span className={`relative block h-2 overflow-hidden rounded-full transition-all duration-500 ${i === current ? "w-9 bg-white/25" : "w-2 bg-white/55 hover:bg-white"}`}>
+                  {i === current && (
+                    <span
+                      key={`${s.id}-${paused}`}
+                      className={`absolute inset-0 origin-left rounded-full bg-[#EACB85] ${paused ? "" : "hero-progress"}`}
+                      style={paused ? undefined : { animationDuration: `${DURATION}ms` }}
+                    />
+                  )}
+                </span>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setStopped((v) => !v)}
+              aria-label={stopped ? "স্লাইড চালু করুন" : "স্লাইড থামান"}
+              className="ml-1 flex h-6 w-6 items-center justify-center rounded-full text-[#F7E2AC] hover:bg-white/10"
+            >
+              {stopped ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
             </button>
-          ))}
-        </div>
+            <span className="hidden pr-1 text-[11px] font-semibold text-[#F7E2AC] sm:inline">
+              {toBengaliNumber(current + 1)}/{toBengaliNumber(count)}
+            </span>
+          </div>
+        </>
       )}
       <div className="gold-line absolute inset-x-0 bottom-0 z-20" />
     </section>

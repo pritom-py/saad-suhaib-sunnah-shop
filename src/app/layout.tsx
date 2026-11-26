@@ -35,7 +35,8 @@ export const metadata: Metadata = {
 };
 
 /** Short menu labels used in the approved design, keyed by category slug. */
-const FOOTER_LABELS: Record<string, string> = { caps: "টুপি" };
+const FOOTER_LABELS: Record<string, string> = { caps: "টুপি", scarves: "রুমাল" };
+const NAV_LABELS: Record<string, string> = { "/category/scarves": "রুমাল" };
 const FALLBACK_NAV = [
   ["/", "হোম"],
   ["/shop", "সব পণ্য"],
@@ -58,7 +59,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const [settings, { navItems, categories }] = await Promise.all([getBusinessSettings(), getNavigationData()]);
 
   const base = navItems.length ? navItems.map((n) => [n.url, n.labelBn]) : FALLBACK_NAV;
-  const links: NavLinkItem[] = base.map(([href, label]) => {
+  // the design has a wholesale entry just before "about"
+  const entries = base.some(([href]) => href === "/wholesale")
+    ? base
+    : base.flatMap((entry) => (entry[0] === "/about" ? [["/wholesale", "পাইকারি"], entry] : [entry]));
+
+  const links: NavLinkItem[] = entries.map(([href, original]) => {
+    const label = NAV_LABELS[href] || original;
     const category = categories.find((c) => href === `/category/${c.slug}` && DROPDOWN_SLUGS.includes(c.slug));
     return {
       href,

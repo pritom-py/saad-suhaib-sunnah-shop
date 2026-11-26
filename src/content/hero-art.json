@@ -1,0 +1,132 @@
+{
+  "slides": {
+    "signature": [
+      {
+        "name": "back",
+        "src": "/hero/layers/signature-back-3ddbeaa2.webp",
+        "depth": 0.45,
+        "left": 39.667,
+        "top": 19.302,
+        "width": 34,
+        "height": 73.023
+      },
+      {
+        "name": "left",
+        "src": "/hero/layers/signature-left-2332b9a5.webp",
+        "depth": 1,
+        "left": 20,
+        "top": 35.465,
+        "width": 33.333,
+        "height": 58.721
+      },
+      {
+        "name": "right",
+        "src": "/hero/layers/signature-right-19736e5b.webp",
+        "depth": 0.8,
+        "left": 65.333,
+        "top": 40.116,
+        "width": 33.333,
+        "height": 54.302
+      }
+    ],
+    "caps": [
+      {
+        "name": "back",
+        "src": "/hero/layers/caps-back-fca55b0a.webp",
+        "depth": 0.45,
+        "left": 39.667,
+        "top": 20.465,
+        "width": 34,
+        "height": 71.86
+      },
+      {
+        "name": "left",
+        "src": "/hero/layers/caps-left-8fa9ed77.webp",
+        "depth": 1,
+        "left": 20,
+        "top": 31.628,
+        "width": 33.333,
+        "height": 62.558
+      },
+      {
+        "name": "right",
+        "src": "/hero/layers/caps-right-c0a79195.webp",
+        "depth": 0.8,
+        "left": 65.333,
+        "top": 52.674,
+        "width": 33.333,
+        "height": 41.744
+      }
+    ],
+    "rumal": [
+      {
+        "name": "back",
+        "src": "/hero/layers/rumal-back-e757e4c7.webp",
+        "depth": 0.45,
+        "left": 39.667,
+        "top": 9.302,
+        "width": 34,
+        "height": 83.023
+      },
+      {
+        "name": "left",
+        "src": "/hero/layers/rumal-left-40318d87.webp",
+        "depth": 1,
+        "left": 20,
+        "top": 37.791,
+        "width": 33.333,
+        "height": 56.395
+      },
+      {
+        "name": "right",
+        "src": "/hero/layers/rumal-right-5e2e9c9c.webp",
+        "depth": 0.8,
+        "left": 65.333,
+        "top": 41.163,
+        "width": 33.333,
+        "height": 53.256
+      }
+    ],
+    "wholesale": [
+      {
+        "name": "back",
+        "src": "/hero/layers/wholesale-back-22367309.webp",
+        "depth": 0.45,
+        "left": 39.2,
+        "top": 14.419,
+        "width": 35,
+        "height": 77.907
+      },
+      {
+        "name": "left",
+        "src": "/hero/layers/wholesale-left-fc2464cd.webp",
+        "depth": 1,
+        "left": 20,
+        "top": 48.953,
+        "width": 33.333,
+        "height": 45.233
+      },
+      {
+        "name": "right",
+        "src": "/hero/layers/wholesale-right-28225698.webp",
+        "depth": 0.8,
+        "left": 65.333,
+        "top": 44.419,
+        "width": 33.333,
+        "height": 50
+      }
+    ]
+  },
+  "leaves": {
+    "left": 89.333,
+    "top": 0,
+    "width": 10.667,
+    "height": 38.372
+  },
+  "lantern": {
+    "left": 84.667,
+    "top": 17.442,
+    "width": 15.333,
+    "height": 39.535
+  }
+}
