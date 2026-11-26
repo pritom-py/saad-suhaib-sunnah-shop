@@ -1,0 +1,20 @@
+{
+  "apphosting": {
+    "backendId": "saad-suhaib-sunnah-shop",
+    "rootDir": ".",
+    "ignore": [
+      "node_modules",
+      ".git",
+      ".next",
+      ".env",
+      ".env.*",
+      "*.db",
+      "*.db-journal",
+      "*.db-wal",
+      "*.db-shm",
+      "*.log",
+      "coverage",
+      "docs"
+    ]
+  }
+}

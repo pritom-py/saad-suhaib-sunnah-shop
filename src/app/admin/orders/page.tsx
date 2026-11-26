@@ -22,9 +22,9 @@ export default async function AdminOrdersPage({
 
   if (params.q) {
     where.OR = [
-      { orderNumber: { contains: params.q } },
-      { guestPhone: { contains: params.q } },
-      { guestName: { contains: params.q } },
+      { orderNumber: { contains: params.q, mode: 'insensitive' } },
+      { guestPhone: { contains: params.q, mode: 'insensitive' } },
+      { guestName: { contains: params.q, mode: 'insensitive' } },
     ];
   }
 

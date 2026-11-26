@@ -158,7 +158,7 @@ export async function searchProducts(params: {
 
     if (params.q) {
       where.OR = bengaliVariants(params.q.trim()).flatMap((q) =>
-        ["nameBn", "nameEn", "descBn", "descEn", "sku"].map((field) => ({ [field]: { contains: q } }))
+        ["nameBn", "nameEn", "descBn", "descEn", "sku"].map((field) => ({ [field]: { contains: q, mode: "insensitive" as const } }))
       );
     }
 

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/locale";
 import { updateOrderStatusAction, updateCourierAction } from "@/actions/admin-orders.action";
-import { ArrowLeft, Truck, CheckCircle2, Shield, Printer } from "lucide-react";
+import { ArrowLeft, Truck, CheckCircle2, Shield } from "lucide-react";
+import PrintButton from "@/components/admin/PrintButton";
 
 export const dynamic = "force-dynamic";
 
@@ -70,13 +71,7 @@ export default async function AdminOrderDetailPage({
           </div>
         </div>
 
-        <button
-          onClick={() => {}}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-colors"
-        >
-          <Printer className="w-4 h-4" />
-          <span>প্রিন্ট চালান</span>
-        </button>
+        <PrintButton />
       </div>
 
       {/* Main Grid: Details & Status Management */}

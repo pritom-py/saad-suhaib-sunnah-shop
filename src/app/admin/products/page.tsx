@@ -20,9 +20,9 @@ export default async function AdminProductsPage({
 
   if (params.q) {
     where.OR = [
-      { nameBn: { contains: params.q } },
-      { nameEn: { contains: params.q } },
-      { sku: { contains: params.q } },
+      { nameBn: { contains: params.q, mode: 'insensitive' } },
+      { nameEn: { contains: params.q, mode: 'insensitive' } },
+      { sku: { contains: params.q, mode: 'insensitive' } },
     ];
   }
 

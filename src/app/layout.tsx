@@ -17,7 +17,12 @@ const noto = Noto_Sans_Bengali({ subsets: ["bengali"], variable: "--font-noto", 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : "http://localhost:3000")
+  ),
   title: "সাদ সুহাইব সুন্নাহ শপ | Saad Suhaib Sunnah Shop",
   description:
     "মসজিদ, মাদ্রাসা ও সাধারণ মুসলিম ভাইদের বিশ্বস্ত ইসলামি পণ্যের অনলাইন শপ। টুপি, পাগড়ি, রুমাল, ডিজিটাল তসবিহ ও কোরআনের গিলাফ।",
@@ -45,6 +50,9 @@ const FALLBACK_NAV = [
 ];
 /** Categories whose menu entry opens a dropdown of their products. */
 const DROPDOWN_SLUGS = ["caps", "turbans"];
+
+// The header and footer come from the database, so no page may be frozen at build time.
+export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [settings, { navItems, categories }] = await Promise.all([getBusinessSettings(), getNavigationData()]);

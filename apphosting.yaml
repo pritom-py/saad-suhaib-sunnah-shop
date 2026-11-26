@@ -1,0 +1,16 @@
+# Firebase App Hosting settings. Secret values live in Cloud Secret Manager, never in this file.
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+  memoryMiB: 512
+
+env:
+  - variable: DATABASE_URL
+    secret: DATABASE_URL
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: AUTH_SECRET
+    secret: AUTH_SECRET
+    availability:
+      - RUNTIME

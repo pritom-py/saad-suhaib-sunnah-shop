@@ -133,7 +133,7 @@ export async function verifyPaymentAction(
           paymentStatus: status === "VERIFIED" ? "PAID" : "REJECTED",
         },
       });
-    });
+    }, { maxWait: 10_000, timeout: 30_000 });
 
     await prisma.auditLog.create({
       data: {

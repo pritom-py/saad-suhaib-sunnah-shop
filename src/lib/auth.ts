@@ -3,7 +3,13 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
 
-const JWT_SECRET = process.env.AUTH_SECRET || "saad_suhaib_sunnah_shop_secret_fallback_key";
+// No built-in fallback in production: the source is not a safe place for a signing key.
+function jwtSecret(): string {
+  const secret = process.env.AUTH_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "production") throw new Error("AUTH_SECRET is not set");
+  return "local-development-only-secret";
+}
 const COOKIE_NAME = "saad_admin_session";
 
 export interface AdminSession {
@@ -14,12 +20,12 @@ export interface AdminSession {
 }
 
 export function signAdminToken(payload: AdminSession): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign(payload, jwtSecret(), { expiresIn: "7d" });
 }
 
 export function verifyAdminToken(token: string): AdminSession | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as AdminSession;
+    return jwt.verify(token, jwtSecret()) as AdminSession;
   } catch {
     return null;
   }

@@ -266,7 +266,10 @@ export async function createOrderAction(
       }
 
       return order;
-    });
+    },
+    // A hosted database adds network time to each query, and a sleeping one needs time to wake.
+    // Prisma's 5 second default made orders fail.
+    { maxWait: 10_000, timeout: 30_000 });
 
     revalidatePath("/admin/orders");
     revalidatePath("/admin/inventory");
