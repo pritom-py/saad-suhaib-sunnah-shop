@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { createProductAction } from "@/actions/admin-products.action";
+import { isValidOffer } from "@/lib/pricing";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 
@@ -22,6 +23,9 @@ export default async function NewProductPage() {
     const categoryId = formData.get("categoryId") as string;
     const regularPrice = formData.get("regularPrice") ? Number(formData.get("regularPrice")) : null;
     const wholesalePrice = formData.get("wholesalePrice") ? Number(formData.get("wholesalePrice")) : null;
+    const offer = formData.get("salePrice") ? Number(formData.get("salePrice")) : null;
+    // an offer that is not below the regular price is not saved
+    const salePrice = isValidOffer(regularPrice, offer) ? offer : null;
     const stockQuantity = Number(formData.get("stockQuantity") || 0);
     const shortDescBn = formData.get("shortDescBn") as string;
     const descBn = formData.get("descBn") as string;
@@ -35,6 +39,7 @@ export default async function NewProductPage() {
       slug: sku.toLowerCase().replace(/[^a-z0-9]/g, "-"),
       categoryId,
       regularPrice,
+      salePrice,
       wholesalePrice,
       stockQuantity,
       shortDescBn,
@@ -117,6 +122,11 @@ export default async function NewProductPage() {
               </select>
             </div>
           </div>
+
+          <label className="block space-y-1">
+            <span className="text-xs font-bold text-primary">অফার মূল্য (৳) — অফার না থাকলে ফাঁকা রাখুন (খুচরা মূল্যের চেয়ে কম হতে হবে)</span>
+            <input type="number" name="salePrice" min={0} step="any" className="field" />
+          </label>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1">

@@ -5,9 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Eye, Heart, Loader2, ShoppingCart } from "lucide-react";
-import { formatPrice } from "@/lib/locale";
 import { useCart } from "@/context/CartContext";
 import { QuickView } from "./QuickView";
+import { priceOf } from "@/lib/pricing";
+import { PriceTag } from "./PriceTag";
 
 export interface ProductCardProps {
   product: {
@@ -18,6 +19,7 @@ export interface ProductCardProps {
     nameEn: string;
     shortDescBn?: string | null;
     regularPrice: number | null;
+    salePrice?: number | null;
     stockQuantity: number;
     isNewArrival?: boolean;
     images?: { url: string; altText?: string | null }[];
@@ -51,6 +53,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const priceKnown = product.regularPrice !== null && product.regularPrice !== undefined;
   const soldOut = product.stockQuantity <= 0;
   const href = `/product/${product.slug}`;
+  const pricing = priceOf(product);
 
   const toggleFavourite = () => {
     const others = readFavourites().filter((id) => id !== product.id);
@@ -70,7 +73,7 @@ export function ProductCard({ product }: ProductCardProps) {
       sku: product.sku,
       nameBn: product.nameBn,
       nameEn: product.nameEn,
-      price: product.regularPrice as number,
+      price: pricing.price as number,
       imageUrl: image,
     });
     setAdded(true);
@@ -126,7 +129,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <Link href={href} className="line-clamp-2 hover:text-[#082B13]">{product.nameBn}</Link>
         </h3>
         <p className="mb-2 flex min-h-[1.8em] items-center font-bold leading-none text-[#710D17]">
-          {priceKnown ? <span className="text-[clamp(18px,1.8vw,24px)]">{formatPrice(product.regularPrice)}</span> : <span className="text-xs">মূল্য জানতে যোগাযোগ করুন</span>}
+          {priceKnown ? <PriceTag value={pricing} /> : <span className="text-xs">মূল্য জানতে যোগাযোগ করুন</span>}
         </p>
         <button type="button" onClick={order} disabled={soldOut || navigating} className="btn-emerald shine mt-auto h-10 w-full text-[clamp(12.5px,1.15vw,16px)]">
           {navigating ? <Loader2 className="h-4 w-4 animate-spin" /> : added ? <Check className="h-4 w-4 text-[#EACB85]" /> : <ShoppingCart className="h-4 w-4 shrink-0" />}

@@ -6,6 +6,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateProductAction } from "@/actions/admin-products.action";
+import { isValidOffer } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -31,13 +32,17 @@ export default async function EditProductPage({
     const text = (k: string) => ((formData.get(k) as string) || "").trim();
     const price = text("regularPrice");
     const imageUrl = text("imageUrl");
+    const offer = text("salePrice");
+    if (offer && !isValidOffer(price ? Number(price) : null, Number(offer))) {
+      redirect(`/admin/products/${product.id}/edit?error=offer`);
+    }
 
     const res = await updateProductAction(product.id, {
       nameBn: text("nameBn"),
       nameEn: text("nameEn"),
       categoryId: text("categoryId"),
       regularPrice: price || null,
-      salePrice: product.salePrice,
+      salePrice: offer || null,
       wholesalePrice: text("wholesalePrice") || null,
       minWholesaleQty: product.minWholesaleQty,
       stockQuantity: text("stockQuantity"),
@@ -88,7 +93,8 @@ export default async function EditProductPage({
           <p className="font-sans text-xs text-gray-500">{product.sku}</p>
         </div>
       </div>
-      {error && <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">পণ্য সংরক্ষণ করা যায়নি। তথ্যগুলো যাচাই করুন।</p>}
+      {error === "offer" && <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">অফার মূল্য অবশ্যই ০ এর বেশি এবং খুচরা মূল্যের চেয়ে কম হতে হবে।</p>}
+      {error && error !== "offer" && <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">পণ্য সংরক্ষণ করা যায়নি। তথ্যগুলো যাচাই করুন।</p>}
 
       <form action={save} className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -103,11 +109,13 @@ export default async function EditProductPage({
             ))}
           </select>
         </label>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           {field("regularPrice", "খুচরা মূল্য (৳)", product.regularPrice, { type: "number", min: 0, step: "any" })}
+          {field("salePrice", "অফার মূল্য (৳) — অফার না থাকলে ফাঁকা রাখুন", product.salePrice, { type: "number", min: 0, step: "any" })}
           {field("wholesalePrice", "পাইকারি মূল্য (৳)", product.wholesalePrice, { type: "number", min: 0, step: "any" })}
           {field("stockQuantity", "স্টক পরিমাণ", product.stockQuantity, { type: "number", min: 0, required: true })}
         </div>
+        <p className="text-xs text-gray-500">অফার মূল্য দিলে ক্রেতা এই দামেই কিনবেন এবং খুচরা মূল্যটি কাটা অবস্থায় দেখাবে। যে দামে আসলেই বিক্রি করেছেন, শুধু সেটিই খুচরা মূল্য হিসেবে দিন।</p>
         {product.variants.length > 0 && (
           <p className="text-xs text-gray-500">এই পণ্যে {product.variants.length} টি সাইজ আছে। যে সাইজগুলোর দাম মূল দামের সমান, সেগুলোও নতুন দামে আপডেট হবে।</p>
         )}

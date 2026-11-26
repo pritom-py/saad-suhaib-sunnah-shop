@@ -5,7 +5,8 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, X } from "lucide-react";
-import { formatPrice } from "@/lib/locale";
+import { priceOf } from "@/lib/pricing";
+import { PriceTag } from "./PriceTag";
 import { useCart } from "@/context/CartContext";
 import type { ProductCardProps } from "./ProductCard";
 
@@ -15,7 +16,8 @@ export function QuickView({ product, onClose }: { product: ProductCardProps["pro
   const variants = product.variants || [];
   const [variantId, setVariantId] = useState<string | null>(variants.find((v) => v.stock > 0)?.id ?? variants[0]?.id ?? null);
   const variant = variants.find((v) => v.id === variantId);
-  const price = variant?.price ?? product.regularPrice;
+  const pricing = priceOf(product, variant?.price);
+  const price = pricing.price;
   const priceKnown = product.regularPrice !== null;
   const stock = variant ? variant.stock : product.stockQuantity;
   const image = product.images?.[0]?.url;
@@ -55,7 +57,7 @@ export function QuickView({ product, onClose }: { product: ProductCardProps["pro
         <div className="relative aspect-square bg-[#f7efdc]">{image && <Image src={image} alt={product.nameBn} fill sizes="340px" className="object-cover" />}</div>
         <div className="flex flex-col gap-3 p-5">
           <h2 className="pr-8 text-xl font-bold leading-snug text-[#063d2b]">{product.nameBn}</h2>
-          <p className="text-2xl font-bold text-[#780e15]">{priceKnown ? formatPrice(price) : "মূল্য জানতে যোগাযোগ করুন"}</p>
+          <p className="text-2xl font-bold text-[#780e15]">{priceKnown ? <PriceTag value={pricing} /> : "মূল্য জানতে যোগাযোগ করুন"}</p>
           {product.shortDescBn && <p className="text-sm leading-relaxed text-[#4f5a53]">{product.shortDescBn}</p>}
           {variants.length > 0 && (
             <fieldset>

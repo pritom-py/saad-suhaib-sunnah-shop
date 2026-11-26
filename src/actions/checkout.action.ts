@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { checkoutSchema } from "@/validations/schemas";
+import { priceOf } from "@/lib/pricing";
 import { revalidatePath } from "next/cache";
 
 export interface OrderItemInput {
@@ -88,6 +89,9 @@ export async function createOrderAction(
           };
         }
       }
+
+      // the same rule the pages use, so an offer price is charged exactly as shown
+      price = priceOf(dbProd, price).price;
 
       if (price === null || price === undefined) {
         return {

@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Phone, MapPin } from "lucide-react";
 import { FacebookIcon, WhatsAppIcon } from "./BrandIcons";
 
@@ -37,24 +38,9 @@ export function Footer({ settings, categories = [] }: FooterProps) {
       <div className="shell py-10 sm:py-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Col 1: Brand & Logo */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2.5">
-            <svg
-              viewBox="0 0 48 40"
-              className="h-9 w-11 text-[#EACB85]"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="24" cy="4" r="1.5" fill="#EACB85" stroke="none" />
-              <path d="M24 7 C21 10, 16 14, 16 22 L32 22 C32 14, 27 10, 24 7 Z" fill="#B68A3E" fillOpacity="0.15" />
-              <path d="M8 38 L8 16 L10 12 L12 16 L12 38" />
-              <path d="M36 38 L36 16 L38 12 L40 16 L40 38" />
-              <path d="M16 38 L16 22 L32 22 L32 38" />
-              <path d="M20 38 L20 28 C20 25.5, 28 25.5, 28 28 L28 38" fill="#EACB85" fillOpacity="0.25" />
-              <line x1="4" y1="38" x2="44" y2="38" strokeWidth="2" />
-            </svg>
+          <div className="flex items-center gap-3">
+            {/* the shop's logo */}
+            <Image src="/logo/logo-seal.png" alt="" width={80} height={80} className="h-20 w-20 shrink-0 rounded-full shadow-[0_3px_10px_rgba(0,0,0,0.45)]" />
             <div className="flex flex-col">
               <span className="font-bold text-lg text-[#EACB85] leading-tight">সাদ সুহাইব</span>
               <span className="text-sm font-semibold text-[#FCF7EA]">সুন্নাহ শপ</span>

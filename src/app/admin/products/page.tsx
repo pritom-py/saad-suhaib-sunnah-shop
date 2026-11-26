@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/locale";
+import { priceOf } from "@/lib/pricing";
 import { Plus, Search, Edit2, Trash2, CheckCircle2, XCircle } from "lucide-react";
 import { deleteProductAction } from "@/actions/admin-products.action";
 
@@ -127,7 +128,10 @@ export default async function AdminProductsPage({
                   <td className="p-3.5 text-primary font-medium">{prod.category.nameBn}</td>
 
                   <td className="p-3.5 font-bold text-maroon font-sans text-sm">
-                    {formatPrice(prod.regularPrice, "bn")}
+                    {formatPrice(priceOf(prod).price, "bn")}
+                    {priceOf(prod).original !== null && (
+                      <del className="block text-[11px] font-medium text-gray-400">{formatPrice(prod.regularPrice, "bn")}</del>
+                    )}
                   </td>
 
                   <td className="p-3.5 font-sans font-bold">

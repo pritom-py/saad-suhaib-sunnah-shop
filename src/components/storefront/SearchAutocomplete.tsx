@@ -6,12 +6,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, Loader2 } from "lucide-react";
 import { formatPrice } from "@/lib/locale";
+import { priceOf } from "@/lib/pricing";
 
 interface Suggestion {
   id: string;
   slug: string;
   nameBn: string;
   regularPrice: number | null;
+  salePrice?: number | null;
   images: { url: string }[];
 }
 
@@ -149,7 +151,7 @@ export function SearchAutocomplete() {
                 </span>
                 <span className="min-w-0 flex-1 truncate text-xs font-semibold text-[#082B13]">{p.nameBn}</span>
                 <span className="shrink-0 text-xs font-bold text-[#710D17]">
-                  {p.regularPrice === null ? "যোগাযোগ" : formatPrice(p.regularPrice)}
+                  {p.regularPrice === null ? "যোগাযোগ" : formatPrice(priceOf(p).price)}
                 </span>
               </Link>
             ))}

@@ -8,6 +8,8 @@ import { ShoppingCart, Zap, Truck, Phone, FileText, Plus, Minus, Check } from "l
 import { formatPrice, toBengaliNumber } from "@/lib/locale";
 import { useCart } from "@/context/CartContext";
 import { WhatsAppIcon } from "./BrandIcons";
+import { priceOf } from "@/lib/pricing";
+import { PriceTag } from "./PriceTag";
 
 export interface ProductViewProps {
   product: {
@@ -16,6 +18,7 @@ export interface ProductViewProps {
     nameBn: string;
     nameEn: string;
     regularPrice: number | null;
+    salePrice?: number | null;
     stockQuantity: number;
     shortDescBn?: string | null;
     category: { nameBn: string; slug: string };
@@ -53,7 +56,8 @@ export function ProductView({
 
   const variant = product.variants.find((v) => v.id === variantId) ?? null;
   const priceKnown = product.regularPrice !== null && product.regularPrice !== undefined;
-  const currentPrice = variant?.price ?? product.regularPrice;
+  const pricing = priceOf(product, variant?.price);
+  const currentPrice = pricing.price;
   const currentStock = variant ? variant.stock : product.stockQuantity;
   const soldOut = currentStock <= 0;
   const blocked = !priceKnown || soldOut;
@@ -149,8 +153,8 @@ export function ProductView({
         <img src="/decorations/golden-divider.svg" alt="" width={240} height={16} className="w-48" />
 
         <div className="flex flex-wrap items-center gap-4">
-          <p className="text-4xl font-bold leading-tight text-[#780e15]">
-            {priceKnown ? formatPrice(currentPrice) : <span className="text-lg">মূল্য জানতে যোগাযোগ করুন</span>}
+          <p>
+            {priceKnown ? <PriceTag value={pricing} size="page" /> : <span className="text-lg font-bold text-[#780e15]">মূল্য জানতে যোগাযোগ করুন</span>}
           </p>
           <span className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-bold ${soldOut ? "border-red-200 bg-red-50 text-red-800" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>
             {!soldOut && <Check className="h-3.5 w-3.5" />}
